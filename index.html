@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pendaftaran Siswa PKBM Mekar Tegal</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f0f8ff; }
+        .form { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; }
+        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
+        button { background: #28a745; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-size: 16px; }
+        button:hover { background: #218838; }
+        .pesan { margin-top: 15px; text-align: center; font-weight: bold; color: #28a745; }
+        .error { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="form">
+        <h2 align="center">Pendaftaran Siswa Baru</h2>
+        <input type="text" id="nama" placeholder="Nama Lengkap" required>
+        <input type="text" id="nis" placeholder="NIS" required>
+        <input type="text" id="kelas" placeholder="Kelas" required>
+        <input type="text" id="alamat" placeholder="Alamat Lengkap" required>
+        <input type="text" id="nohp" placeholder="Nomor HP" required>
+        <button onclick="kirimData()">Kirim Berkas Data</button>
+        <div id="pesanHasil" class="pesan"></div>
+    </div>
+
+    <script>
+        // Alamat database Firebase kamu - SUDAH BENAR!
+        const DB_URL = "https://pkbm-mekar-tegal-default-rtdb.firebaseio.com/Data_siswa.json";
+
+        function kirimData() {
+            const pesan = document.getElementById("pesanHasil");
+            
+            // Ambil isi dari kolom isian
+            const data = {
+                Nama: document.getElementById("nama").value,
+                Nis: document.getElementById("nis").value,
+                Kelas: document.getElementById("kelas").value,
+                Alamat: document.getElementById("alamat").value,
+                NoPhone: document.getElementById("nohp").value
+            };
+
+            // Cek jika ada yang kosong
+            if (!data.Nama || !data.Nis || !data.Kelas || !data.Alamat || !data.NoPhone) {
+                pesan.textContent = "❌ Harap isi semua kolom!";
+                pesan.className = "pesan error";
+                return;
+            }
+
+            // Kirim ke Firebase
+            fetch(DB_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(() => {
+                pesan.textContent = "✅ Berhasil! Data sudah terkirim.";
+                pesan.className = "pesan";
+                // Kosongkan form setelah berhasil
+                document.getElementById("nama").value = "";
+                document.getElementById("nis").value = "";
+                document.getElementById("kelas").value = "";
+                document.getElementById("alamat").value = "";
+                document.getElementById("nohp").value = "";
+            })
+            .catch(() => {
+                pesan.textContent = "❌ Gagal mengirim! Cek koneksi atau aturan Firebase.";
+                pesan.className = "pesan error";
+            });
+        }
+    </script>
+</body>
+</html>
